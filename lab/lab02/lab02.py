@@ -15,7 +15,11 @@ def lambda_curry2(func):
     3
     """
     "*** YOUR CODE HERE ***"
-    return ______
+    def g(x):
+        def h(y):
+            return func(x, y)
+        return h
+    return g
 
 
 
@@ -47,7 +51,14 @@ def count_cond(condition):
     8
     """
     "*** YOUR CODE HERE ***"
-
+    def calc(n):
+        idx, cnt = 1, 0
+        while idx <= n:
+            if (condition(n, idx)):
+                cnt += 1
+            idx += 1
+        return cnt
+    return calc
 
 
 def compose1(f, g):
@@ -82,7 +93,7 @@ def composite_identity(f, g):
     False
     """
     "*** YOUR CODE HERE ***"
-
+    return lambda x: compose1(f, g)(x) == compose1(g, f)(x)
 
 
 def cycle(f1, f2, f3):
@@ -112,4 +123,18 @@ def cycle(f1, f2, f3):
     19
     """
     "*** YOUR CODE HERE ***"
+    def op(n):
+        def f(x):
+            rest = n
+            while rest >= 3:
+                x = f3(f2(f1(x)))
+                rest -= 3
+            if rest == 0:
+                return x
+            elif rest == 1:
+                return f1(x)
+            elif rest == 2:
+                return f2(f1(x))
+        return f
+    return op
 
