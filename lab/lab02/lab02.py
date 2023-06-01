@@ -15,13 +15,14 @@ def lambda_curry2(func):
     3
     """
     "*** YOUR CODE HERE ***"
-    def g(x):
-        def h(y):
-            return func(x, y)
-        return h
-    return g
+    # def g(x):
+    #     def h(y):
+    #         return func(x, y)
+    #     return h
+    # return g
 
-
+    # offical solution
+    return lambda arg1: lambda arg2: func(arg1, arg2)
 
 def count_cond(condition):
     """Returns a function with one parameter N that counts all the numbers from
@@ -51,14 +52,14 @@ def count_cond(condition):
     8
     """
     "*** YOUR CODE HERE ***"
-    def calc(n):
+    def counter(n):
         idx, cnt = 1, 0
         while idx <= n:
             if (condition(n, idx)):
                 cnt += 1
             idx += 1
         return cnt
-    return calc
+    return counter
 
 
 def compose1(f, g):
