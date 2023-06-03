@@ -1,11 +1,11 @@
 """CS 61A Presents The Game of Hog."""
 
-from dice import six_sided, four_sided, make_test_dice
+from dice import six_sided, four_sided, make_test_dice, make_fair_dice
 from ucb import main, trace, interact
 
 GOAL_SCORE = 100  # The goal of Hog is to score 100 points.
 FIRST_101_DIGITS_OF_PI = 31415926535897932384626433832795028841971693993751058209749445923078164062862089986280348253421170679
-
+max_average = {'4:4': 4.45402, '5:5': 6.41346, '6:6': 8.67984, '7:7': 11.38582, '8:8': 14.52192, '9:9': 17.7645, '10:9': 21.66794}
 ######################
 # Phase 1: Simulator #
 ######################
@@ -344,6 +344,12 @@ def make_averaged(original_function, trials_count=1000):
     """
     # BEGIN PROBLEM 8
     "*** YOUR CODE HERE ***"
+    def average(*args):
+        sum = 0
+        for i in range(trials_count):
+            sum += original_function(*args)
+        return sum / trials_count
+    return average
     # END PROBLEM 8
 
 
@@ -358,6 +364,12 @@ def max_scoring_num_rolls(dice=six_sided, trials_count=1000):
     """
     # BEGIN PROBLEM 9
     "*** YOUR CODE HERE ***"
+    max_average, max_num =  0, 0
+    for i in range(1, 11):
+        average = make_averaged(roll_dice, trials_count)(i, dice)
+        if average > max_average:
+            max_average, max_num = average, i
+    return max_num
     # END PROBLEM 9
 
 
@@ -407,7 +419,9 @@ def bacon_strategy(score, opponent_score, cutoff=8, num_rolls=6):
     rolls NUM_ROLLS otherwise.
     """
     # BEGIN PROBLEM 10
-    return 6  # Replace this statement
+    if free_bacon(opponent_score) >= cutoff:
+        return 0
+    return num_rolls  # Replace this statement
     # END PROBLEM 10
 
 
@@ -417,17 +431,34 @@ def extra_turn_strategy(score, opponent_score, cutoff=8, num_rolls=6):
     Otherwise, it rolls NUM_ROLLS.
     """
     # BEGIN PROBLEM 11
-    return 6  # Replace this statement
+    if extra_turn(score + free_bacon(opponent_score), opponent_score):
+        return 0
+    return bacon_strategy(score, opponent_score, cutoff, num_rolls)  # Replace this statement
     # END PROBLEM 11
 
 
-def final_strategy(score, opponent_score):
+def final_strategy(score, opponent_score, cutoff = max_average["6:6"]):
     """Write a brief description of your final strategy.
 
     *** YOUR DESCRIPTION HERE ***
     """
     # BEGIN PROBLEM 12
-    return 6  # Replace this statement
+    roll_nums = 6
+    if extra_turn(score + free_bacon(opponent_score), opponent_score):
+        return 0
+    elif score + free_bacon(opponent_score) > GOAL_SCORE:
+        return 0
+    elif free_bacon(opponent_score) > cutoff:
+        return 0
+    elif GOAL_SCORE - score > cutoff:
+        return roll_nums
+    elif score >= opponent_score and GOAL_SCORE - score < cutoff / 2:
+        return roll_nums // 2
+    elif score >= opponent_score and GOAL_SCORE - score < cutoff:
+        return roll_nums
+    elif score < opponent_score and GOAL_SCORE - score < cutoff:
+        return roll_nums
+    # Replace this statement
     # END PROBLEM 12
 
 ##########################
@@ -437,6 +468,17 @@ def final_strategy(score, opponent_score):
 # NOTE: Functions in this section do not need to be changed. They use features
 # of Python not yet covered in the course.
 
+def max_average_score(trials_count = 50000):
+    dic = {}
+    for sided in range(4, 11):
+        dice = make_fair_dice(sided)
+        average = [0] * 11
+        for roll_nums in range(1, 11):
+            sum = 0
+            for _ in range(trials_count):
+                sum += roll_dice(roll_nums, dice)
+            average[roll_nums] = sum / trials_count
+    dic["{}:{}".format(sided, average.index(max(average)))] = max(average)
 
 @main
 def run(*args):
