@@ -99,6 +99,18 @@ def autocorrect(user_word, valid_words, diff_function, limit):
     """
     # BEGIN PROBLEM 5
     "*** YOUR CODE HERE ***"
+    diff_char = []
+    for x in valid_words:
+        diff_num = diff_function(user_word, x, limit)
+        if diff_num < limit:
+            limit = diff_num
+            diff_char = [x]
+        elif diff_num == limit:
+            diff_char += [x]
+    if len(diff_char) == 0 or user_word in valid_words:
+        return user_word
+    else:
+        return diff_char[0]
     # END PROBLEM 5
 
 
@@ -108,32 +120,33 @@ def shifty_shifts(start, goal, limit):
     their lengths.
     """
     # BEGIN PROBLEM 6
-    assert False, 'Remove this line'
+    # assert False, 'Remove this line'
+    if limit < 0:
+        return 0
+    elif start == '' or goal == '':
+        return max(len(start), len(goal))
+    else:
+        if start[0] != goal[0]:
+            return 1 + shifty_shifts(start[1:], goal[1:], limit - 1)
+        else:
+            return shifty_shifts(start[1:], goal[1:], limit)
+
     # END PROBLEM 6
 
 
 def pawssible_patches(start, goal, limit):
     """A diff function that computes the edit distance from START to GOAL."""
-    assert False, 'Remove this line'
-
-    if ______________: # Fill in the condition
-        # BEGIN
-        "*** YOUR CODE HERE ***"
-        # END
-
-    elif ___________: # Feel free to remove or add additional cases
-        # BEGIN
-        "*** YOUR CODE HERE ***"
-        # END
-
+    if limit < 0: 
+        return 0
+    elif start == '' or goal == '':
+        return max(len(start), len(goal))
+    elif start[0] == goal[0]:
+        return pawssible_patches(start[1:], goal[1:], limit)
     else:
-        add_diff = ... # Fill in these lines
-        remove_diff = ...
-        substitute_diff = ...
-        # BEGIN
-        "*** YOUR CODE HERE ***"
-        # END
-
+        add_diff = pawssible_patches(start, goal[1:], limit - 1)
+        remove_diff = pawssible_patches(start[1:], goal, limit - 1)
+        substitute_diff = pawssible_patches(start[1:], goal[1:], limit - 1)
+        return min(add_diff, remove_diff, substitute_diff) + 1
 
 def final_diff(start, goal, limit):
     """A diff function. If you implement this function, it will be used."""
