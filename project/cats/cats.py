@@ -162,6 +162,15 @@ def report_progress(typed, prompt, user_id, send):
     """Send a report of your id and progress so far to the multiplayer server."""
     # BEGIN PROBLEM 8
     "*** YOUR CODE HERE ***"
+    correct_num = 0
+    for i in range(len(typed)):
+        if typed[i] == prompt[i]:
+            correct_num += 1
+        else:
+            break
+    ratio = correct_num / len(prompt)
+    send({'id': user_id, 'progress': ratio})
+    return ratio
     # END PROBLEM 8
 
 
@@ -188,6 +197,11 @@ def time_per_word(times_per_player, words):
     """
     # BEGIN PROBLEM 9
     "*** YOUR CODE HERE ***"
+    time = [[0] * len(words) for _ in range(len(times_per_player))]
+    for id in range(len(times_per_player)):
+        for word_index in range(len(words)):
+            time[id][word_index] = times_per_player[id][word_index + 1] - times_per_player[id][word_index]
+    return game(words, time)
     # END PROBLEM 9
 
 
@@ -203,7 +217,15 @@ def fastest_words(game):
     word_indices = range(len(all_words(game)))    # contains an *index* for each word
     # BEGIN PROBLEM 10
     "*** YOUR CODE HERE ***"
-    # END PROBLEM 10
+    lst = [[] for _ in player_indices]
+    for word_index in word_indices:
+        word = word_at(game, word_index)
+        time_lst = []
+        for id in player_indices:
+            time_lst += [time(game, id, word_index)]
+        id_index = time_lst.index(min(time_lst))
+        lst[id_index].append(word)
+    return lst
 
 
 def game(words, times):
@@ -242,7 +264,7 @@ def game_string(game):
     """A helper function that takes in a game object and returns a string representation of it"""
     return "game(%s, %s)" % (game[0], game[1])
 
-enable_multiplayer = False  # Change to True when you're ready to race.
+enable_multiplayer = True  # Change to True when you're ready to race.
 
 ##########################
 # Command Line Interface #
